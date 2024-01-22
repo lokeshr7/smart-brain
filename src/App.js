@@ -8,60 +8,42 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 
-import Particles from 'react-particles-js';
+import Particles from 'particles-bg';
 
 const serverAddress = 'https://immense-gorge-64119.herokuapp.com/'
 
-const particlesOptions = {
-  particles: {
-    number: {
-      value: 100,
-      density: {
-        enable: true,
-        value_area: 800
-      }
-    }
-  }
-  /*,interactivity: {
-    events: {
-      onhover: {
-        enable: true,
-        mode: "repulse"
-        }
-      }
-  }*/
-}
-
 const initalState = {
-      input: '',
-      imageUrl: '',
-      box: {},
-      route: 'signin',
-      isSignedIn: false,
-      user:{
-        id: '',
-        name: '',
-        email: '',
-        entries: 0,
-        joined: ''
-      }
+  input: '',
+  imageUrl: '',
+  box: {},
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
 }
 
 class App extends React.Component {
-  
-  constructor(){
+
+  constructor() {
     super();
     this.state = initalState
   }
 
   loadUser = (data) => {
-    this.setState( {user: {
+    this.setState({
+      user: {
         id: data.id,
         name: data.name,
         email: data.email,
         entries: data.entries,
         joined: data.joined
-    }})
+      }
+    })
   }
 
   calculateFaceLocation = (data) => {
@@ -79,82 +61,79 @@ class App extends React.Component {
   }
 
   displayFaceBox = (box) => {
-    this.setState({box: box})
+    this.setState({ box: box })
   }
 
   onInputChange = (event) => {
-    this.setState({input: event.target.value})
+    this.setState({ input: event.target.value })
   }
 
   onButtonSubmit = () => {
-    this.setState({imageUrl: this.state.input})
-    /*app.models.predict(Clarifai.FACE_DETECT_MODEL,this.state.input)*/
+    this.setState({ imageUrl: this.state.input })
 
     fetch(`${serverAddress}imageurl`, {
-          method: 'post',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-          input: this.state.input
-          })
-        })
-    .then(response => response.json())
-    .then(response => {
-      if(response) {
-        fetch(`${serverAddress}image`, {
-          method: 'put',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-          id: this.state.user.id
-          })
-        })
-        .then(result => result.json())
-        .then(count => {
-          this.setState(Object.assign(this.state.user, {entries: count}))
-        })
-        .catch(console.log)
-      } 
-      this.displayFaceBox(this.calculateFaceLocation(response))
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        input: this.state.input
+      })
     })
-    .catch(error => console.log(error))
+      .then(response => response.json())
+      .then(response => {
+        if (response) {
+          fetch(`${serverAddress}image`, {
+            method: 'put',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          })
+            .then(result => result.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count }))
+            })
+            .catch(console.log)
+        }
+        this.displayFaceBox(this.calculateFaceLocation(response))
+      })
+      .catch(error => console.log(error))
   }
 
   onRouteChange = (route) => {
-    if(route === 'signout'){
+    if (route === 'signout') {
       this.setState(initalState)
-    } else if(route === 'home'){
-      this.setState({isSignedIn: true})
+    } else if (route === 'home') {
+      this.setState({ isSignedIn: true })
     }
-    this.setState({route: route})
+    this.setState({ route: route })
   }
 
-  render(){
-    const { isSignedIn, imageUrl, route, box} = this.state
+  render() {
+    const { isSignedIn, imageUrl, route, box } = this.state
     return (
       <div className="App">
-      <Particles className='particles'
-      params={particlesOptions}
-      />
+        <Particles type='cobweb' bg={true} />
         <Navigation onRouteChange={this.onRouteChange} isSignedIn={isSignedIn} />
-        
-        { 
+
+        {
           route === 'home'
 
             ? <div>
-                <Logo />
-                <Rank name={this.state.user.name} entries={this.state.user.entries}/>
-                <ImageLinkForm 
-                onInputChange = {this.onInputChange} 
-                onButtonSubmit = {this.onButtonSubmit}
-                />
-                <FaceRecognition box={box} imageUrl={imageUrl} />
-              </div>
+              <Logo />
+              <Rank name={this.state.user.name} entries={this.state.user.entries} />
+              <ImageLinkForm
+                onInputChange={this.onInputChange}
+                onButtonSubmit={this.onButtonSubmit}
+              />
+              <FaceRecognition box={box} imageUrl={imageUrl} />
+            </div>
 
-            : ( 
-                route === 'signin'
-                  ? <Signin onRouteChange={this.onRouteChange} loadUser={this.loadUser} serverAddress={serverAddress}/>
-                  : <Register onRouteChange={this.onRouteChange} loadUser={this.loadUser} serverAddress={serverAddress}/>
-              )
-      }
+            : (
+              route === 'signin'
+                ? <Signin onRouteChange={this.onRouteChange} loadUser={this.loadUser} serverAddress={serverAddress} />
+                : <Register onRouteChange={this.onRouteChange} loadUser={this.loadUser} serverAddress={serverAddress} />
+            )
+        }
       </div>
     );
   }
