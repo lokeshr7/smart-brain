@@ -10,7 +10,7 @@ import Register from './components/Register/Register';
 
 import Particles from 'particles-bg';
 
-const serverAddress = 'https://immense-gorge-64119.herokuapp.com/'
+const serverAddress = 'http://localhost:3001/'
 
 const initalState = {
   input: '',
