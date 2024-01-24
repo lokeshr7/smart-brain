@@ -46,8 +46,7 @@ class App extends React.Component {
     })
   }
 
-  calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box
+  calculateFaceLocation = (clarifaiFace) => {
     const image = document.getElementById('inputimage')
     const width = Number(image.width)
     const height = Number(image.height)
@@ -90,7 +89,7 @@ class App extends React.Component {
           })
             .then(result => result.json())
             .then(count => {
-              this.setState(Object.assign(this.state.user, { entries: count }))
+              this.setState(Object.assign(this.state.user, { entries: count.entries }))
             })
             .catch(console.log)
         }
