@@ -29,16 +29,24 @@ export default function App() {
   const [box, setBox] = useState({});
   const [route, setRoute] = useState('signin')
   const [isSignedIn, setIsSignedIn] = useState(false)
+  const [user, setUser] = useState({ ...initalState.user })
+
+  const resetState = () => {
+    setInput('')
+    setImageUrl('')
+    setBox({})
+    setRoute('signin')
+    setIsSignedIn(false)
+    setUser({ ...initalState.user })
+  }
 
   const loadUser = (data) => {
-    setState({
-      user: {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        entries: data.entries,
-        joined: data.joined
-      }
+    setUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
     })
   }
 
@@ -80,12 +88,12 @@ export default function App() {
             method: 'put',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              id: state.user.id
+              id: user.id
             })
           })
             .then(result => result.json())
             .then(count => {
-              setState(Object.assign(state.user, { entries: count.entries }))
+              setUser({ ...user, entries: count.entries })
             })
             .catch(console.log)
         }
@@ -96,11 +104,14 @@ export default function App() {
 
   const onRouteChange = (route) => {
     if (route === 'signout') {
-      setState(initalState)
+      resetState()
     } else if (route === 'home') {
       setIsSignedIn(true)
+      setRoute(route)
     }
-    setRoute(route)
+    else {
+      setRoute(route)
+    }
   }
 
   return (
@@ -113,7 +124,7 @@ export default function App() {
 
           ? <div>
             <Logo />
-            <Rank name={state.user.name} entries={state.user.entries} />
+            <Rank name={user.name} entries={user.entries} />
             <ImageLinkForm
               onInputChange={onInputChange}
               onButtonSubmit={onButtonSubmit}
